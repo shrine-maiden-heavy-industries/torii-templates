@@ -1,0 +1,9 @@
+{
+	"templates": {
+		"core": {
+			"title": "Torii Library",
+			"description": "A library for use in other Torii based designs, also known as an IP or core",
+			"path": "core"
+		}
+	}
+}

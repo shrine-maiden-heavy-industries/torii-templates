@@ -1,0 +1,1 @@
+../../common/templates/CHANGELOG.md.jinja

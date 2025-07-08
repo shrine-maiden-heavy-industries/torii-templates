@@ -1,0 +1,1 @@
+../../../common/templates/docs/changelog.md
