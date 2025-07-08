@@ -11,7 +11,7 @@ This repository contains a collection of [Cookiecutter] templates for stamping o
 To use these templates, you first need to [install cookiecutter], once done, you can use the templates by invoking:
 
 ```shell
-$ cookiecutter https://shrine-maiden-heavy.industries/torii-templates
+$ cookiecutter https://github.com/shrine-maiden-heavy-industries/torii-templates
 ```
 
 It will first ask you which template you want, then walk you through filling out the template to generate the project.
