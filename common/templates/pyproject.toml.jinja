@@ -1,0 +1,83 @@
+# SPDX-License-Identifier: {{ cookiecutter.code_license }}
+[project]
+name = '{{ cookiecutter.project_slug }}'
+description = '{{ cookiecutter.project_description }}'
+authors = [
+	{ name = '{{ cookiecutter.author }}', email = '{{ cookiecutter.email }}' },
+]
+dynamic = [ 'version' ]
+license = '{{ cookiecutter.code_license }}'
+license-files = [ 'LICENSE', 'LICENSE.*' ]
+readme = 'README.md'
+requires-python = '>={{ cookiecutter.min_python }}'
+dependencies = [
+	'torii>=0.8.0,<1',
+	{%- for extra_dep in cookiecutter.__extra_deps -%}
+	'{{ extra_dep }}',
+	{%- endfor %}
+]
+keywords = [
+]
+classifiers = [
+]
+
+[project.optional-dependencies]
+dev = [ 'nox' ]
+
+[project.urls]
+source = '{{ cookiecutter.__forge_url }}'
+issues = '{{ cookiecutter.__forge_url }}/issues'
+
+[build-system]
+requires = ['setuptools>=66', 'setuptools-scm>=8']
+build-backend = 'setuptools.build_meta'
+
+[tool.setuptools.packages.find]
+where = ['.']
+exclude = [
+	'contrib',
+	'contrib.*',
+	'docs',
+	'docs.*',
+	'examples',
+	'examples.*',
+	'tests',
+	'tests.*',
+]
+namespaces = false
+
+[tool.setuptools.package-data]
+torii = ['py.typed']
+
+[tool.setuptools_scm]
+version_scheme = 'guess-next-dev'
+local_scheme = 'node-and-date'
+
+[tool.coverage.run]
+branch = true
+omit = [
+	'*/noxfile.py',
+	'*/__main__.py',
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+	':nocov:',
+	# Allow defensive code
+	'^\s*raise AssertionError\b',
+	'^\s*raise NotImplementedError\b',
+	'^\s*raise NotImplemented\b',
+	'^\s*raise$',
+	# Typing-Related
+	'^\s*if (False|TYPE_CHECKING):',
+	': \.\.\.(\s*#.*)?$',
+	'^ +\.\.\.$',
+	# Skipped/Failed tests
+	'^\s*self\.skipTest\b',
+	'^\s*self\.fail\b',
+]
+partial_branches = [
+	':nobr:'
+]

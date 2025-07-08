@@ -1,0 +1,135 @@
+name: '{{ cookiecutter.project_name }} CI'
+on:
+  push:
+    branches-ignore:
+      - 'gh-pages'
+    paths:
+      - '.github/workflows/ci.yml'
+      - 'docs/**'
+      - 'examples/**'
+      - 'tests/**'
+      - '{{ cookiecutter.project_slug }}/**'
+      - 'noxfile.py'
+      - 'pyproject.toml'
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+  pull_request:
+    branches:
+      - main
+
+env:
+  TOOL_PYTHON_VERSION: '{{ cookiecutter.min_python }}'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: 'Lint {{ cookiecutter.project_name }}'
+    steps:
+      - name: 'Initialize Environment'
+        shell: bash
+        env:
+          WORKSPACE: {% raw %}${{ github.workspace }}{% endraw %}
+        run: |
+          echo "$HOME/.local/bin:$PATH" >> $GITHUB_PATH
+          echo "GITHUB_WORKSPACE=\"`pwd`\"" >> $GITHUB_ENV
+
+      - name: 'Install Dependencies'
+        shell: bash
+        run: |
+          python -m pip install --user --upgrade pip setuptools wheel setuptools_scm nox
+
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 'Run Style Lint'
+        shell: bash
+        run: |
+          nox -s lint
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.11', '3.12', '3.13', ]
+        allow-failure:
+         - false
+        include:
+          - python-version: '3.14-dev'
+            allow-failure: true
+
+    name: 'Test {{ cookiecutter.project_name }} {% raw %}(${{ matrix.python-version }}){% endraw %}'
+    steps:
+      - name: 'Setup Python {% raw %}(${{ matrix.python-version }}){% endraw %}'
+        uses: actions/setup-python@v5
+        with:
+          python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
+
+      - name: 'Initialize Environment'
+        shell: bash
+        env:
+          WORKSPACE: {% raw %}${{ github.workspace }}{% endraw %}
+        run: |
+          echo "$HOME/.local/bin:$PATH" >> $GITHUB_PATH
+          echo "GITHUB_WORKSPACE=\"`pwd`\"" >> $GITHUB_ENV
+
+      - name: 'Install Dependencies'
+        shell: bash
+        run: |
+          python -m pip install --user --upgrade pip setuptools wheel setuptools_scm nox
+
+      - name: 'Setup OSS CAD Suite'
+        uses: YosysHQ/setup-oss-cad-suite@v3
+        with:
+          github-token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
+
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 'Run Tests'
+        shell: bash
+        run: |
+          nox -s test
+
+      - name: 'Codecov Upload'
+        if: success() && github.repository == '{{ cookiecutter.forge_user }}/{{ cookiecutter.project_slug }}'
+        uses: codecov/codecov-action@v5
+        with:
+          verbose: true
+          files: ./build/tests/coverage.xml
+          token: {% raw %}${{ secrets.CODECOV_TOKEN }}{% endraw %}
+
+  linkcheck-docs:
+    runs-on: ubuntu-latest
+    name: '{{ cookiecutter.project_name }} Docs - Link-check'
+    steps:
+      - name: 'Setup Python {% raw %}(${{ env.TOOL_PYTHON_VERSION }}){% endraw %}'
+        uses: actions/setup-python@v5
+        with:
+          python-version: {% raw %}${{ env.TOOL_PYTHON_VERSION }}{% endraw %}
+
+      - name: 'Initialize Environment'
+        shell: bash
+        env:
+          WORKSPACE: {% raw %}${{ github.workspace }}{% endraw %}
+        run: |
+          echo "$HOME/.local/bin:$PATH" >> $GITHUB_PATH
+          echo "GITHUB_WORKSPACE=\"`pwd`\"" >> $GITHUB_ENV
+
+      - name: 'Install Dependencies'
+        shell: bash
+        run: |
+          python -m pip install --user --upgrade pip setuptools wheel setuptools_scm nox
+
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 'Link Check'
+        shell: bash
+        run: |
+          nox -s linkcheck-docs

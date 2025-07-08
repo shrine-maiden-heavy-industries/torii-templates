@@ -1,0 +1,75 @@
+# SPDX-License-Identifier: {{ cookiecutter.code_license }}
+
+import os
+import sys
+
+from datetime import date
+from pathlib  import Path
+
+DOCS_DIR = Path(__file__).resolve()
+ROOT_DIR = DOCS_DIR.parent.parent
+
+# If we have any custom sphinx plugins/code ensure our path is good
+sys.path.insert(0, DOCS_DIR.absolute)
+
+from {{ cookiecutter.project_slug }} import __version__ as project_version
+
+project   = '{{ cookiecutter.project_name }}'
+version   = project_version
+release   = project_version.split('+')[0]
+copyright = f'{% raw %}{date.today().year}{% endraw %} {{ cookiecutter.author }}'
+language  = 'en'
+
+html_baseurl = ''
+
+extensions = [
+	'sphinx.ext.autodoc',
+	'sphinx.ext.doctest',
+	'sphinx.ext.extlinks',
+	'sphinx.ext.githubpages',
+	'sphinx.ext.intersphinx',
+	'sphinx.ext.napoleon',
+	'sphinx.ext.todo',
+	'sphinx_inline_tabs',
+	'sphinxcontrib.wavedrom',
+	'myst_parser',
+	'sphinx_copybutton',
+	'sphinx_codeautolink',
+	'sphinx_autodoc_typehints',
+]
+
+source_suffix = {
+	'.rst': 'restructuredtext',
+	'.md': 'markdown',
+}
+
+extlinks = {
+	'issue': ('{{ cookiecutter.__forge_url }}/issues/%s', '{{ cookiecutter.project_slug }}/%s'),
+	'pypi':  ('https://pypi.org/project/%s/', '%s'),
+}
+
+autodoc_member_order   = 'bysource'
+graphviz_output_format = 'svg'
+todo_include_todos     = True
+
+intersphinx_mapping = {
+	'python': ('https://docs.python.org/3', None),
+	'torii':  ('https://torii.shmdn.link/latest', None),
+}
+
+napoleon_google_docstring              = False
+napoleon_numpy_docstring               = True
+napoleon_use_ivar                      = True
+napoleon_use_admonition_for_notes      = True
+napoleon_use_admonition_for_examples   = True
+napoleon_use_admonition_for_references = True
+
+myst_heading_anchors = 3
+
+always_use_bars_union = True
+typehints_defaults = 'braces-after'
+typehints_use_signature = True
+typehints_use_signature_return = True
+
+html_theme       = 'furo'
+html_copy_source = False

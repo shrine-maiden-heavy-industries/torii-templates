@@ -1,0 +1,9 @@
+furo
+myst-parser
+sphinx
+sphinx-autodoc-typehints
+sphinx-codeautolink
+sphinx-copybutton
+sphinx-inline-tabs
+sphinxcontrib-wavedrom
+wavedrom

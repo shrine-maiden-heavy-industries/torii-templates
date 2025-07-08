@@ -1,0 +1,88 @@
+# SPDX-License-Identifier: {{ cookiecutter.code_license }}
+
+from os           import getenv
+from pathlib      import Path
+
+import nox
+from nox.sessions import Session
+
+ROOT_DIR  = Path(__file__).parent
+
+BUILD_DIR = ROOT_DIR  / 'build'
+CNTRB_DIR = ROOT_DIR  / 'contrib'
+DOCS_DIR  = ROOT_DIR  / 'docs'
+DIST_DIR  = BUILD_DIR / 'dist'
+
+IN_CI           = getenv('GITHUB_WORKSPACE') is not None
+ENABLE_COVERAGE = IN_CI or getenv('TEST_ENABLE_COVERAGE') is not None
+
+# Default sessions to run
+nox.options.sessions = (
+	'test',
+	'lint',
+)
+
+@nox.session()
+def test(session: Session) -> None:
+	WORK_DIR = BUILD_DIR / 'tests'
+	WORK_DIR.mkdir(parents = True, exist_ok = True)
+
+	unitest_args = (
+		'-m', 'unittest', 'discover', '-s', str(ROOT_DIR)
+	)
+
+	session.install('.')
+
+	if ENABLE_COVERAGE:
+		session.log('Coverage Support Enabled')
+		session.install('coverage[toml]')
+		coverage_args = ('-m', 'coverage', 'run')
+	else:
+		coverage_args = tuple[str]()
+
+	session.chdir(str(WORK_DIR))
+
+	session.log('Running tests...')
+	session.run('python', *coverage_args, *unitest_args, *session.posargs)
+
+	if ENABLE_COVERAGE:
+		session.log('Processing coverage data')
+		session.run('python', '-m', 'coverage', 'xml')
+
+
+@nox.session
+def lint(session: Session) -> None:
+	session.install('flake8')
+
+	session.run(
+		'flake8', '--config', str((CNTRB_DIR / '.flake8').resolve()),
+		'./{{ cookiecutter.project_slug }}', './tests', './examples', './docs'
+	)
+
+@nox.session(name = 'watch-docs')
+def watch_docs(session: Session) -> None:
+	WORK_DIR = BUILD_DIR / 'docs'
+
+	session.install('-r', str(DOCS_DIR / 'requirements.txt'))
+	session.install('sphinx-autobuild')
+	session.install('.')
+
+	session.run('sphinx-autobuild', str(DOCS_DIR), str(WORK_DIR))
+
+@nox.session(name = 'build-docs')
+def build_docs(session: Session) -> None:
+	WORK_DIR = BUILD_DIR / 'docs'
+
+	session.install('-r', str(DOCS_DIR / 'requirements.txt'))
+	session.install('.')
+
+	session.run('sphinx-build', '-b', 'html', str(DOCS_DIR), str(WORK_DIR))
+
+@nox.session(name = 'linkcheck-docs')
+def linkcheck_docs(session: Session) -> None:
+	WORK_DIR = BUILD_DIR / 'docs-linkcheck'
+
+	session.install('-r', str(DOCS_DIR / 'requirements.txt'))
+	session.install('.')
+
+	session.run('sphinx-build', '-b', 'linkcheck', str(DOCS_DIR), str(WORK_DIR))

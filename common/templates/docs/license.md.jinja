@@ -1,0 +1,41 @@
+# License
+
+{% if cookiecutter.code_license != 'Other' %}
+{{ cookiecutter.project_name }} is licensed under the [{{ cookiecutter.code_license }}], the full text of which can be found in the [`LICENSE`] file in the root of the [git repository] and has also been included below.
+{%- else %}
+***TODO*** License Information
+{%- endif %}
+
+{% if cookiecutter.docs_license != 'Same As Code' %}
+The {{ cookiecutter.project_name }} documentation is licensed under the [{{ cookiecutter.docs_license }}], the full text of which can be found in the [`LICENSE.docs`] file in the root of the [git repository] and has also been included below.
+{%- elif cookiecutter.docs_license == 'Other' -%}
+***TODO*** License Information
+{%- endif %}
+
+## {{ cookiecutter.code_license }}
+
+```{literalinclude} ../LICENSE
+---
+language: text
+---
+```
+
+{% if cookiecutter.docs_license != 'Same As Code' %}
+## {{ cookiecutter.docs_license }}
+
+```{literalinclude} ../LICENSE.docs
+---
+language: text
+---
+```
+{%- endif %}
+
+{% if cookiecutter.code_license != 'Other' %}
+[{{ cookiecutter.code_license }}]: {{ cookiecutter.__spdx_url_code }}
+[`LICENSE`]: {{ cookiecutter.__forge_url }}/blob/main/LICENSE
+{%- endif %}
+{% if cookiecutter.docs_license not in ('Other',  'Same As Code') %}
+[{{ cookiecutter.docs_license }}]: {{ cookiecutter.__spdx_url_docs }}
+[`LICENSE.docs`]: {{ cookiecutter.__forge_url }}/blob/main/LICENSE.docs
+{%- endif %}
+[git repository]: {{ cookiecutter.__forge_url }}
