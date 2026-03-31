@@ -39,7 +39,7 @@ jobs:
           python -m pip install --user --upgrade pip setuptools wheel setuptools_scm nox
 
       - name: 'Checkout'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -62,7 +62,7 @@ jobs:
     name: 'Test {{ cookiecutter.project_name }} {% raw %}(${{ matrix.python-version }}){% endraw %}'
     steps:
       - name: 'Setup Python {% raw %}(${{ matrix.python-version }}){% endraw %}'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: {% raw %}${{ matrix.python-version }}{% endraw %}
 
@@ -85,7 +85,7 @@ jobs:
           github-token: {% raw %}${{ secrets.GITHUB_TOKEN }}{% endraw %}
 
       - name: 'Checkout'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
@@ -107,7 +107,7 @@ jobs:
     name: '{{ cookiecutter.project_name }} Docs - Link-check'
     steps:
       - name: 'Setup Python {% raw %}(${{ env.TOOL_PYTHON_VERSION }}){% endraw %}'
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: {% raw %}${{ env.TOOL_PYTHON_VERSION }}{% endraw %}
 
@@ -125,7 +125,7 @@ jobs:
           python -m pip install --user --upgrade pip setuptools wheel setuptools_scm nox
 
       - name: 'Checkout'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 1
 
